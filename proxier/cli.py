@@ -1,4 +1,5 @@
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from argparse import ArgumentParser
+from sys import argv, stderr
 
 from proxier.config import Urls
 from proxier.func import save
@@ -11,11 +12,15 @@ def register_parser(subparser, name: str, url: str):
 
 
 def parse_args():
-    default = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
+    default = ArgumentParser()
     subparsers = default.add_subparsers()
     register_parser(subparsers, 'http', Urls.HTTP.value)
     register_parser(subparsers, 'socks4', Urls.SOCKS4.value)
     register_parser(subparsers, 'socks5', Urls.SOCKS5.value)
+
+    if len(argv) == 1:
+        default.print_help(stderr)
+        exit(1)
 
     return default.parse_args()
 
@@ -23,7 +28,3 @@ def parse_args():
 def main():
     args = parse_args()
     save(args.name, args.url)
-
-
-if __name__ == '__main__':
-    main()
